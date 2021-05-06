@@ -1,7 +1,6 @@
 public class Sudoku{
     /**Backtracking-7 algorithm:
      * Function isValid() that checks if a given matrix is a valid (filled) sudoku grid. 
-     *      - We keep a hasmap (frequency counter) for row, column, box values. If any number has frequency > 1, return false (invalid)
      * Recursive function that takes the grid and current position for the value we are trying to fill in
      * - Base cases:
      *      - If the position is at the end of the puzzle grid, check if the grid is valid. If so, return true.
