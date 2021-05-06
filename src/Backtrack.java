@@ -67,7 +67,7 @@ public class Backtrack{
 
      public static void main(String args[]){
       Scanner keyboard = new Scanner(System.in);
-   		System.out.println("Please enter the filename");
+   		System.out.println("Please enter the filename:");
    		String filename = keyboard.nextLine();
    		keyboard.close();
    		Board generator = new Board();

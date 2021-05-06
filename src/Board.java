@@ -19,20 +19,20 @@ public class Board {
 	 */
 	public void createFile(Sudoku sudoku, String filename) {
 		try {
-			File myObj = new File(filename);
+			File myObj = new File("../boards/" + filename);
 			// checks to see if the file already exists
 			if (myObj.createNewFile()) {
-				System.out.println("File created: " + myObj.getName());
+				System.out.println("File created in boards/: " + myObj.getName());
 				this.exportToTxt(sudoku, filename);
 			} else {
 				System.out.println("The file already exists. I'll quit now");
-				System.exit(0);
+				System.exit(1);
 			}
 		}
 		// checks if an error occurred
 		catch (IOException e) {
 			System.out.println("Something went wrong. I'll quit now.");
-			System.exit(0);
+			System.exit(1);
 		}
 	}
 
@@ -52,7 +52,7 @@ public class Board {
 		// checks if the file does not exist
 		catch (FileNotFoundException e) {
 			System.out.println("File not found. I'll quit now.");
-			System.exit(0);
+			System.exit(1);
 		}
 	}
 
@@ -69,17 +69,17 @@ public class Board {
 				}
 			}
 			scanner.close();
-			System.out.println("Successful read from " + filename + ".");
+			System.out.println("Successful read from boards/" + filename);
 		}
 		// checks if file does not exist
 		catch (FileNotFoundException e) {
 			System.out.println("File not found. I'll quit now.");
-			System.exit(0);
+			System.exit(1);
 		}
 		// checks if an error occurred
 		catch (Exception e) {
 			System.out.println("Something went wrong. I'll quit now.");
-			System.exit(0);
+			System.exit(1);
 		}
 		return sudoku;
 	}
