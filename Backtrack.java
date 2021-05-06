@@ -1,16 +1,16 @@
 public class Backtrack{
     /**Backtracking-7 algorithm:
-     * Function isValid() that checks if a given matrix is a valid (filled) sudoku grid. 
+     * Function isValid() that checks if a given matrix is a valid (filled) sudoku grid.
      * Recursive function that takes the grid and current position for the value we are trying to fill in
      * - Base cases:
      *      - If the position is at the end of the puzzle grid, check if the grid is valid. If so, return true.
      *      - When position is at the last column, move to next row
      * - if current position is blank/unassigned, fill it in with 1-9 and recur for all 9 cases with the position of the next element. If the recursive call returns true, break the loop and return true.
      * - if the current index is assigned, then call the recursive function with position of next element
-     * 
-     * Algorithm used from https://see.stanford.edu/materials/icspacs106b/H19-RecBacktrackExamples.pdf 
+     *
+     * Algorithm used from https://see.stanford.edu/materials/icspacs106b/H19-RecBacktrackExamples.pdf
      *  */
-    
+
     /**Checks if filling the @param num in at location @param row, @param col makes the puzzle invalid (unsolvable) */
     public static boolean isValid(int[][] puzzle, int row, int col, int num){
         // Check that number is not already present in the row or column
@@ -49,7 +49,7 @@ public class Backtrack{
             if(!isEmpty) break; //Unfilled values means we continue to backtracking
         }
         if(isEmpty) return true; //fully filled puzzle --> solution found
-        
+
         // Backtrack --> assign a number from 1-9 --> if valid, recursively call, until a full solution is found or no solutions remain
         for(int num=1; num <= puzzle.length; num++){
             if(isValid(puzzle,row,col,num)){ //placing num at row,col is valid (will be further backtracked)
@@ -63,7 +63,7 @@ public class Backtrack{
         }
         return false;
     }
-    
+
     // public static void main(String args[]){
     //     // EXAMPLE RUN OF SEQUENTIAL BACKTRACKING ALGORITHM:
     //     Puzzle p1 = new Puzzle(new int[][] {
