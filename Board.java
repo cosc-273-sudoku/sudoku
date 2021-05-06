@@ -92,6 +92,6 @@ public class Board {
 		Board generator = new Board();
 		generator.generate(filename);
 		Sudoku sudoku = generator.readTxt(filename);
-		sudoku.printSudoku();
+		System.out.println(sudoku.toString());
 	}
 }
