@@ -6,32 +6,32 @@ public class Sudoku {
 		matrix = new int[9][9];
 	}
 
-	//gets the puzzle
-	public int[][] getPuzzle(){
-			return this.matrix;
+	// gets the puzzle
+	public int[][] getPuzzle() {
+		return this.matrix;
 	}
 
-	//sets a value in the matrix
-	public void setValue(int row, int col, int val){
-			if(row < 0 || row >= matrix.length || col < 0 || col > matrix[0].length){ //Out of grid bounds
-					System.out.println("Attempted to set a value out of bounds. Row: "+row+", Col: "+col);
-					return;
-			}
-			if(val < 0 || val > 9){ //invalid value
-					System.out.println("Attempted to set a value out of range [0,9]");
-					return;
-			}
+	// sets a value in the matrix
+	public void setValue(int row, int col, int val) {
+		if (row < 0 || row >= matrix.length || col < 0 || col > matrix[0].length) { // Out of grid bounds
+			System.out.println("Attempted to set a value out of bounds. Row: " + row + ", Col: " + col);
+			return;
+		}
+		if (val < 0 || val > 9) { // invalid value
+			System.out.println("Attempted to set a value out of range [0,9]");
+			return;
+		}
 
-			this.matrix[row][col] = val;
+		this.matrix[row][col] = val;
 	}
 
-	//gets a value in the matrix
-	public int getValue(int row, int col){
-			if(row < 0 || row >= matrix.length || col < 0 || col > matrix[0].length){
-					System.out.println("Attempted to access a value out of bounds. Row: "+row+", Col: "+col);
-					return -999;
-			}
-			return this.matrix[row][col];
+	// gets a value in the matrix
+	public int getValue(int row, int col) {
+		if (row < 0 || row >= matrix.length || col < 0 || col > matrix[0].length) {
+			System.out.println("Attempted to access a value out of bounds. Row: " + row + ", Col: " + col);
+			return -999;
+		}
+		return this.matrix[row][col];
 	}
 
 	public void fillValues() {
@@ -173,20 +173,14 @@ public class Sudoku {
 
 	// prints the Sudoku board - used this to check if work is correct.
 	@Override
-	public String toString(){
-			String s = "";
-			for(int r=0; r<matrix.length; r++){
-					for(int c=0; c<matrix[0].length; c++){
-							s += matrix[r][c]+" ";
-					}
-					s += "\n";
+	public String toString() {
+		String s = "";
+		for (int r = 0; r < matrix.length; r++) {
+			for (int c = 0; c < matrix[0].length; c++) {
+				s += matrix[r][c] + " ";
 			}
-			return s;
-	}
-
-	public static void main(String[] args) {
-		Sudoku sudoku = new Sudoku();
-		sudoku.fillValues();
-		System.out.println(sudoku.toString());
+			s += "\n";
+		}
+		return s;
 	}
 }

@@ -19,10 +19,10 @@ public class Board {
 	 */
 	public void createFile(Sudoku sudoku, String filename) {
 		try {
-			File myObj = new File("../boards/" + filename);
+			File myObj = new File(filename);
 			// checks to see if the file already exists
 			if (myObj.createNewFile()) {
-				System.out.println("File created in boards/: " + myObj.getName());
+				System.out.println("File created: " + myObj.getPath());
 				this.exportToTxt(sudoku, filename);
 			} else {
 				System.out.println("The file already exists. I'll quit now");
@@ -69,7 +69,7 @@ public class Board {
 				}
 			}
 			scanner.close();
-			System.out.println("Successful read from boards/" + filename);
+			System.out.println("Successful read from " + filename + ".");
 		}
 		// checks if file does not exist
 		catch (FileNotFoundException e) {
@@ -82,16 +82,5 @@ public class Board {
 			System.exit(1);
 		}
 		return sudoku;
-	}
-
-	public static void main(String[] args) {
-		Scanner keyboard = new Scanner(System.in);
-		System.out.println("Please enter the filename");
-		String filename = keyboard.nextLine();
-		keyboard.close();
-		Board generator = new Board();
-		generator.generate(filename);
-		Sudoku sudoku = generator.readTxt(filename);
-		System.out.println(sudoku.toString());
 	}
 }

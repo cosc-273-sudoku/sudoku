@@ -1,81 +1,80 @@
-import java.util.Scanner;
-public class Backtrack{
-    /**Backtracking-7 algorithm:
-     * Function isValid() that checks if a given matrix is a valid (filled) sudoku grid.
-     * Recursive function that takes the grid and current position for the value we are trying to fill in
-     * - Base cases:
-     *      - If the position is at the end of the puzzle grid, check if the grid is valid. If so, return true.
-     *      - When position is at the last column, move to next row
-     * - if current position is blank/unassigned, fill it in with 1-9 and recur for all 9 cases with the position of the next element. If the recursive call returns true, break the loop and return true.
-     * - if the current index is assigned, then call the recursive function with position of next element
+public class Backtrack {
+    /**
+     * Backtracking-7 algorithm: Function isValid() that checks if a given matrix is
+     * a valid (filled) sudoku grid. Recursive function that takes the grid and
+     * current position for the value we are trying to fill in - Base cases: - If
+     * the position is at the end of the puzzle grid, check if the grid is valid. If
+     * so, return true. - When position is at the last column, move to next row - if
+     * current position is blank/unassigned, fill it in with 1-9 and recur for all 9
+     * cases with the position of the next element. If the recursive call returns
+     * true, break the loop and return true. - if the current index is assigned,
+     * then call the recursive function with position of next element
      *
-     * Algorithm used from https://see.stanford.edu/materials/icspacs106b/H19-RecBacktrackExamples.pdf
-     *  */
+     * Algorithm used from
+     * https://see.stanford.edu/materials/icspacs106b/H19-RecBacktrackExamples.pdf
+     */
 
-    /**Checks if filling the @param num in at location @param row, @param col makes the puzzle invalid (unsolvable) */
-    public static boolean isValid(int[][] puzzle, int row, int col, int num){
+    /**
+     * Checks if filling the @param num in at location @param row, @param col makes
+     * the puzzle invalid (unsolvable)
+     */
+    public static boolean isValid(int[][] puzzle, int row, int col, int num) {
         // Check that number is not already present in the row or column
-        for(int j=0; j<puzzle.length; j++){
-            if(puzzle[row][j] == num || puzzle[j][col] == num) return false;
+        for (int j = 0; j < puzzle.length; j++) {
+            if (puzzle[row][j] == num || puzzle[j][col] == num)
+                return false;
         }
         // Check that number is not already present in 3x3 grid
         int gLen = (int) Math.sqrt(puzzle.length);
         int gRow = row - row % gLen;
         int gCol = col - col % gLen;
-        for(int r=gRow; r < gRow+gLen; r++){
-            for(int c=gCol; c < gCol+gLen; c++){
-                if(puzzle[r][c] == num) return false;
+        for (int r = gRow; r < gRow + gLen; r++) {
+            for (int c = gCol; c < gCol + gLen; c++) {
+                if (puzzle[r][c] == num)
+                    return false;
             }
         }
-        return true; //no rules broke
+        return true; // no rules broke
     }
 
-    /**Uses backtracking-7 algorithm to solve a partially filled @param puzzle grid and
-       attempts to assign values at all blank positions for a valid solution if possible*/
-    public static boolean solveSudoku(Sudoku puz){
+    /**
+     * Uses backtracking-7 algorithm to solve a partially filled @param puzzle grid
+     * and attempts to assign values at all blank positions for a valid solution if
+     * possible
+     */
+    public static boolean solveSudoku(Sudoku puz) {
         int[][] puzzle = puz.getPuzzle();
         int row = -1;
         int col = -1;
         boolean isEmpty = true;
 
-        for(int r=0; r<puzzle.length; r++){
-            for(int c=0; c<puzzle[0].length; c++){
-                if(puzzle[r][c] == 0){
+        for (int r = 0; r < puzzle.length; r++) {
+            for (int c = 0; c < puzzle[0].length; c++) {
+                if (puzzle[r][c] == 0) {
                     row = r;
                     col = c;
-                    isEmpty = false; //There are still unfilled values in puzzle
+                    isEmpty = false; // There are still unfilled values in puzzle
                     break;
                 }
             }
-            if(!isEmpty) break; //Unfilled values means we continue to backtracking
+            if (!isEmpty)
+                break; // Unfilled values means we continue to backtracking
         }
-        if(isEmpty) return true; //fully filled puzzle --> solution found
+        if (isEmpty)
+            return true; // fully filled puzzle --> solution found
 
-        // Backtrack --> assign a number from 1-9 --> if valid, recursively call, until a full solution is found or no solutions remain
-        for(int num=1; num <= puzzle.length; num++){
-            if(isValid(puzzle,row,col,num)){ //placing num at row,col is valid (will be further backtracked)
-                puz.setValue(row,col,num);
-                if(solveSudoku(puz)){
+        // Backtrack --> assign a number from 1-9 --> if valid, recursively call, until
+        // a full solution is found or no solutions remain
+        for (int num = 1; num <= puzzle.length; num++) {
+            if (isValid(puzzle, row, col, num)) { // placing num at row,col is valid (will be further backtracked)
+                puz.setValue(row, col, num);
+                if (solveSudoku(puz)) {
                     return true;
-                }else{
-                    puz.setValue(row,col,0);
+                } else {
+                    puz.setValue(row, col, 0);
                 }
             }
         }
         return false;
     }
-
-     public static void main(String args[]){
-      Scanner keyboard = new Scanner(System.in);
-   		System.out.println("Please enter the filename:");
-   		String filename = keyboard.nextLine();
-   		keyboard.close();
-   		Board generator = new Board();
-   		generator.generate(filename);
-   		Sudoku p1 = generator.readTxt(filename);
-   		System.out.println(p1.toString());
-      if(solveSudoku(p1))
-        System.out.println(p1.toString());
-      else System.out.println("No solution");
-  }
 }
