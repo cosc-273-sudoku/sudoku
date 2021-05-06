@@ -1,3 +1,4 @@
+import java.util.Scanner;
 public class Backtrack{
     /**Backtracking-7 algorithm:
      * Function isValid() that checks if a given matrix is a valid (filled) sudoku grid.
@@ -31,7 +32,7 @@ public class Backtrack{
 
     /**Uses backtracking-7 algorithm to solve a partially filled @param puzzle grid and
        attempts to assign values at all blank positions for a valid solution if possible*/
-    public static boolean solveSudoku(Puzzle puz){
+    public static boolean solveSudoku(Sudoku puz){
         int[][] puzzle = puz.getPuzzle();
         int row = -1;
         int col = -1;
@@ -64,19 +65,17 @@ public class Backtrack{
         return false;
     }
 
-    // public static void main(String args[]){
-    //     // EXAMPLE RUN OF SEQUENTIAL BACKTRACKING ALGORITHM:
-    //     Puzzle p1 = new Puzzle(new int[][] {
-    //         {0,0,0,0,6,9,0,0,0},
-    //         {1,3,0,0,5,0,0,0,0},
-    //         {0,7,6,4,0,0,5,0,0},
-    //         {0,0,0,8,0,0,0,6,4},
-    //         {9,0,0,0,4,0,0,0,3},
-    //         {6,1,0,0,0,7,0,0,0},
-    //         {0,0,5,0,0,4,2,7,0},
-    //         {0,0,0,0,9,0,0,8,5},
-    //         {0,0,0,6,7,0,0,0,0}});
-    //     if(solveSudoku(p1)) System.out.println(p1.toString());
-    //     else System.out.println("No solution");
-    // }
+     public static void main(String args[]){
+      Scanner keyboard = new Scanner(System.in);
+   		System.out.println("Please enter the filename");
+   		String filename = keyboard.nextLine();
+   		keyboard.close();
+   		Board generator = new Board();
+   		generator.generate(filename);
+   		Sudoku p1 = generator.readTxt(filename);
+   		System.out.println(p1.toString());
+      if(solveSudoku(p1))
+        System.out.println(p1.toString());
+      else System.out.println("No solution");
+  }
 }
