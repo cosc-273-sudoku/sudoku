@@ -157,8 +157,8 @@ public class Sudoku {
 	// randomly removes numbers and replace them with 0, indicating that it's now
 	// empty
 	public void removeRandDigits() {
-		// randomly determines how many numbers to remove (0-81)
-		int count = (int) (Math.random() * 82);
+		// randomly determines how many numbers to remove (30-50)
+		int count = (int) (Math.random() * (20)) + 30;
 		while (count != 0) {
 			// gets random row and col (0-9)
 			int row = (int) (Math.random() * 9);
