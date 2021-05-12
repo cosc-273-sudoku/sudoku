@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -104,7 +105,7 @@ public class Board {
   public boolean tryLockCell(int row, int col) {
     gridLock.lock();
     try {
-      int miniGridLockIndex = getBoxNum(row, col);
+      int miniGridLockIndex = getMiniGridNum(row, col);
       ArrayList<Lock> locks = new ArrayList<Lock>();
       if (this.rowLocks[row].tryLock()) {
         locks.add(this.rowLocks[row]);
@@ -135,70 +136,73 @@ public class Board {
     try {
       rowLocks[row].unlock();
       colLocks[col].unlock();
-      miniGridLocks[3 * row + col].unlock();
+      miniGridLocks[getMiniGridNum(row, col)].unlock();
     } finally {
       gridLock.unlock();
     }
   }
+
+  public void setPossibleValuesForGrid() {
+    for (int row = 0; row < 9; row++) {
+      for (int col = 0; col < 9; col++) {
+        if (this.grid[row][col].getValue() == 0) {
+          setPossibleValuesForCell(row, col);
+        }
+      }
+    }
+  }
+
   /*
-   * These three methods find the possible values for the Cell at (row, col)
+   * Sets the possible values for each Cell in the grid
    */
-  public void findValuesRow (int row, int col) {
-    ArrayList<Integer> list = new ArrayList();
-    for (int i = 0; i < 9; i++) {
-      list.add(i+1);
+  private void setPossibleValuesForCell(int row, int col) {
+    HashSet<Integer> possibleValues = new HashSet<Integer>();
+    for (int value = 1; value <= 9; value++) {
+      possibleValues.add(value);
     }
+
     // Remove values that are already in the row
-    for (int i = 0; i < 9; i++) {
-      if (i == row) {
-        continue;
+    for (int r = 0; r < 9; r++) {
+      if (r == row) continue;
+      int invalid = this.grid[r][col].getValue();
+      if (possibleValues.contains(invalid)) {
+        possibleValues.remove(invalid);
       }
-      int invalid = grid[i][col].getValue();
-      list.remove(Integer.valueOf(invalid));
     }
-    grid[row][col].setValids(list);
-  }
 
-  public void findValuesCol (int row, int col) {
-    ArrayList<Integer> list = new ArrayList();
-    for (int i = 0; i < 9; i++) {
-      list.add(i+1);
-    }
     // Remove values that are already in the column
-    for (int i = 0; i < 9; i++) {
-      if (i == col) {
-        continue;
+    for (int c = 0; c < 9; c++) {
+      if (c == col) continue;
+      int invalid = this.grid[row][c].getValue();
+      if (possibleValues.contains(invalid)) {
+        possibleValues.remove(invalid);
       }
-      int invalid = grid[row][i].getValue();
-      list.remove(Integer.valueOf(invalid));
     }
-    grid[row][col].setValids(list);
-  }
 
-  public void findValuesBox (int row, int col) {
-    ArrayList<Integer> list = new ArrayList();
-    for (int i = 0; i < 9; i++) {
-      list.add(i+1);
-    }
-    // Remove values that are already in the box
+    // Remove values that are already in the mini-grid
     int cornerRow = row - (row % 3);
     int cornerCol = col - (col % 3);
-    for (int i = 0; i < 3; i++) {
-      for (int j = 0; j < 3; j++) {
-        int invalid = grid[cornerRow + i][cornerCol + j].getValue();
-        list.remove(Integer.valueOf(invalid));
+    for (int r = 0; r < 3; r++) {
+      for (int c = 0; c < 3; c++) {
+        if (r == row && c == col) continue;
+        int invalid = grid[cornerRow + r][cornerCol + c].getValue();
+        if (possibleValues.contains(invalid)) {
+          possibleValues.remove(invalid);
+        }
       }
     }
-    grid[row][col].setValids(list);
+
+    this.grid[row][col].setPossibleValues(possibleValues);
   }
 
-  private int getBoxNum (int row, int col) {
+  private int getMiniGridNum(int row, int col) {
     // Converts from 9x9 grid values to 3x3 grid values
-    int boxRow = (row - (row % 3)) / 3;
-    int boxCol = (col - (col % 3)) / 3;
+    int miniGridRow = (row - (row % 3)) / 3;
+    int miniGridCol = (col - (col % 3)) / 3;
 
-    return 3 * boxRow + boxCol;
+    return 3 * miniGridRow + miniGridCol;
   }
+
   // fills in the diagonal 3x3 sub matrices
   private void fillDiagonal() {
     for (int start = 0; start < 9; start = start + 3) {

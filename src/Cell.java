@@ -1,10 +1,11 @@
+import java.util.HashSet;
+
 public class Cell {
   private int value;
-  private ArrayList<Integer> valids;
+  private HashSet<Integer> possibleValues = new HashSet<Integer>();
 
   public Cell(int value) {
     this.value = value;
-    valids = new ArrayList();
   }
 
   public int getValue() {
@@ -15,11 +16,11 @@ public class Cell {
     this.value = value;
   }
 
-  public ArrayList<Integer> getValids () {
-    return this.valids;
+  public HashSet<Integer> getPossibleValues() {
+    return this.possibleValues;
   }
 
-  public void setValids(ArrayList<Integer> valids) {
-    this.valids = valids;
+  public void setPossibleValues(HashSet<Integer> possibleValues) {
+    this.possibleValues = possibleValues;
   }
 }
