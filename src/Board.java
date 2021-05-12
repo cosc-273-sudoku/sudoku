@@ -104,7 +104,7 @@ public class Board {
   public boolean tryLockCell(int row, int col) {
     gridLock.lock();
     try {
-      int miniGridLockIndex = 3 * row + col;
+      int miniGridLockIndex = getBoxNum(row, col);
       ArrayList<Lock> locks = new ArrayList<Lock>();
       if (this.rowLocks[row].tryLock()) {
         locks.add(this.rowLocks[row]);
@@ -140,7 +140,65 @@ public class Board {
       gridLock.unlock();
     }
   }
+  /*
+   * These three methods find the possible values for the Cell at (row, col)
+   */
+  public void findValuesRow (int row, int col) {
+    ArrayList<Integer> list = new ArrayList();
+    for (int i = 0; i < 9; i++) {
+      list.add(i+1);
+    }
+    // Remove values that are already in the row
+    for (int i = 0; i < 9; i++) {
+      if (i == row) {
+        continue;
+      }
+      int invalid = grid[i][col].getValue();
+      list.remove(Integer.valueOf(invalid));
+    }
+    grid[row][col].setValids(list);
+  }
 
+  public void findValuesCol (int row, int col) {
+    ArrayList<Integer> list = new ArrayList();
+    for (int i = 0; i < 9; i++) {
+      list.add(i+1);
+    }
+    // Remove values that are already in the column
+    for (int i = 0; i < 9; i++) {
+      if (i == col) {
+        continue;
+      }
+      int invalid = grid[row][i].getValue();
+      list.remove(Integer.valueOf(invalid));
+    }
+    grid[row][col].setValids(list);
+  }
+
+  public void findValuesBox (int row, int col) {
+    ArrayList<Integer> list = new ArrayList();
+    for (int i = 0; i < 9; i++) {
+      list.add(i+1);
+    }
+    // Remove values that are already in the box
+    int cornerRow = row - (row % 3);
+    int cornerCol = col - (col % 3);
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        int invalid = grid[cornerRow + i][cornerCol + j].getValue();
+        list.remove(Integer.valueOf(invalid));
+      }
+    }
+    grid[row][col].setValids(list);
+  }
+
+  private int getBoxNum (int row, int col) {
+    // Converts from 9x9 grid values to 3x3 grid values
+    int boxRow = (row - (row % 3)) / 3;
+    int boxCol = (col - (col % 3)) / 3;
+
+    return 3 * boxRow + boxCol;
+  }
   // fills in the diagonal 3x3 sub matrices
   private void fillDiagonal() {
     for (int start = 0; start < 9; start = start + 3) {

@@ -1,8 +1,10 @@
 public class Cell {
   private int value;
+  private ArrayList<Integer> valids;
 
   public Cell(int value) {
     this.value = value;
+    valids = new ArrayList();
   }
 
   public int getValue() {
@@ -11,5 +13,13 @@ public class Cell {
 
   public void setValue(int value) {
     this.value = value;
+  }
+
+  public ArrayList<Integer> getValids () {
+    return this.valids;
+  }
+
+  public void setValids(ArrayList<Integer> valids) {
+    this.valids = valids;
   }
 }
