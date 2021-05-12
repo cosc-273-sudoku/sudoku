@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -176,7 +177,7 @@ public class Board {
    * Sets the possible values for each Cell in the grid
    */
   private void setPossibleValuesForCell(int row, int col) {
-    HashSet<Integer> possibleValues = new HashSet<Integer>();
+    Set<Integer> possibleValues = new HashSet<Integer>();
     for (int value = 1; value <= 9; value++) {
       possibleValues.add(value);
     }
@@ -220,7 +221,7 @@ public class Board {
    * the row, column, and mini-grid of the Cell
    */
   public void removePossibleValue(int row, int col, int value) {
-    HashSet<Integer> possibleValues;
+    Set<Integer> possibleValues;
     // remove value in possible values for row
     for (int r = 0; r < 9; r++) {
       possibleValues = this.grid[r][col].getPossibleValues();

@@ -4,21 +4,22 @@ public class Driver {
     BoardGenerator generator = new BoardGenerator();
     // generator.generate(filename);
     Board backtrackBoard = generator.readTxt(filename);
+    long start;
+    long stop;
     System.out.println("Sudoku Board:");
+    start = System.nanoTime();
     System.out.println(backtrackBoard);
-    System.out.println("Possible Values:");
-    backtrackBoard.setPossibleValuesForGrid();
-    for (int r = 0; r < 9; r++) {
-      for (int c = 0; c < 9; c++) {
-        System.out.println(
-            r + ", " + c + ": " + backtrackBoard.getGrid()[r][c].getPossibleValues());
-      }
-    }
+    stop = System.nanoTime();
     System.out.println("Solved Sudoku Board (Backtrack):");
     Backtrack.solveBoard(backtrackBoard);
+    System.out.println("Runtime: " + (stop - start));
+    System.out.println(backtrackBoard);
     Board parallelBoard = generator.readTxt(filename);
-    System.out.println("Solved Sudoku Board (Parallel):");
+    start = System.nanoTime();
     Parallel.solveBoard(parallelBoard);
+    stop = System.nanoTime();
+    System.out.println("Solved Sudoku Board (Parallel):");
+    System.out.println("Runtime: " + (stop - start));
     System.out.println(parallelBoard);
     if (backtrackBoard.equals(parallelBoard)) {
       System.out.println("Boards are equal.");

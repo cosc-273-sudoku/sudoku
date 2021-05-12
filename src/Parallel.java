@@ -15,8 +15,6 @@ public class Parallel {
       //   continue;
       // }
     } while (valueSet.get());
-    System.out.println("Before Backtrack:");
-    System.out.println(board);
     Backtrack.solveBoard(board);
   }
 
