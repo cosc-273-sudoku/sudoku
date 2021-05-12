@@ -1,19 +1,44 @@
+import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EliminationTask implements Runnable {
+  private Board board;
   private int cornerRow;
   private int cornerCol;
-  private boolean checkRows; // if false, check columns
-  private AtomicBoolean valueChanged;
+  private AtomicBoolean valueSet;
 
-  public EliminationTask(
-      int cornerRow, int cornerCol, boolean checkRows, AtomicBoolean valueChanged) {
+  public EliminationTask(Board board, int cornerRow, int cornerCol, AtomicBoolean valueSet) {
+    this.board = board;
     this.cornerRow = cornerRow;
     this.cornerCol = cornerCol;
-    this.checkRows = checkRows;
-    this.valueChanged = valueChanged;
+    this.valueSet = valueSet;
   }
 
-  // TODO
-  public void run() {}
+  public void run() {
+    Cell[][] grid = this.board.getGrid();
+    for (int r = this.cornerRow; r < 3; r++) {
+      for (int c = this.cornerCol; c < 3; c++) {
+        int row = this.cornerRow + r;
+        int col = this.cornerCol + c;
+        Cell cell = grid[row][col];
+        if (cell.getValue() == 0) {
+          if (this.board.tryLockCell(r, c)) {
+            try {
+              HashSet<Integer> possibleValues = cell.getPossibleValues();
+              System.out.println(possibleValues);
+              if (possibleValues.size() == 1) {
+                System.out.println("corner " + cornerRow + " " + cornerCol);
+                Integer value = possibleValues.toArray(new Integer[1])[0];
+                cell.setValue(value);
+                this.valueSet.set(true);
+                this.board.removePossibleValue(row, col, value);
+              }
+            } finally {
+              this.board.unlockCell(r, c);
+            }
+          }
+        }
+      }
+    }
+  }
 }

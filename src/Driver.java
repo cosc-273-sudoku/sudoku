@@ -3,18 +3,25 @@ public class Driver {
     String filename = "../boards/" + args[0];
     BoardGenerator generator = new BoardGenerator();
     // generator.generate(filename);
-    Board board = generator.readTxt(filename);
+    Board backtrackBoard = generator.readTxt(filename);
     System.out.println("Sudoku Board:");
-    System.out.println(board.toString());
-    board.setPossibleValuesForGrid();
-    for (int row = 0; row < 9; row++) {
-      for (int col = 0; col < 9; col++) {
+    System.out.println(backtrackBoard);
+    System.out.println("Possible Values:");
+    backtrackBoard.setPossibleValuesForGrid();
+    for (int r = 0; r < 9; r++) {
+      for (int c = 0; c < 9; c++) {
         System.out.println(
-            row + ", " + col + ": " + board.getBoard()[row][col].getPossibleValues());
+            r + ", " + c + ": " + backtrackBoard.getGrid()[r][c].getPossibleValues());
       }
     }
-    System.out.println("Solved Sudoku Board:");
-    if (Backtrack.solveBoard(board)) System.out.println(board.toString());
-    else System.out.println("No solution.");
+    System.out.println("Solved Sudoku Board (Backtrack):");
+    Backtrack.solveBoard(backtrackBoard);
+    Board parallelBoard = generator.readTxt(filename);
+    System.out.println("Solved Sudoku Board (Parallel):");
+    Parallel.solveBoard(parallelBoard);
+    System.out.println(parallelBoard);
+    if (backtrackBoard.equals(parallelBoard)) {
+      System.out.println("Boards are equal.");
+    }
   }
 }

@@ -40,8 +40,28 @@ public class Board {
     return s;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    } else if (o instanceof Board) {
+      Board toCompareBoard = (Board) o;
+      Cell[][] toCompareGrid = toCompareBoard.getGrid();
+      for (int r = 0; r < 9; r++) {
+        for (int c = 0; c < 9; c++) {
+          if (this.grid[r][c].getValue() != toCompareGrid[r][c].getValue()) {
+            return false;
+          }
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   // gets the board
-  public Cell[][] getBoard() {
+  public Cell[][] getGrid() {
     return this.grid;
   }
 
@@ -193,6 +213,39 @@ public class Board {
     }
 
     this.grid[row][col].setPossibleValues(possibleValues);
+  }
+
+  /*
+   * removes value from the set of possible values in
+   * the row, column, and mini-grid of the Cell
+   */
+  public void removePossibleValue(int row, int col, int value) {
+    HashSet<Integer> possibleValues;
+    // remove value in possible values for row
+    for (int r = 0; r < 9; r++) {
+      possibleValues = this.grid[r][col].getPossibleValues();
+      if (possibleValues.contains(value)) {
+        possibleValues.remove(value);
+      }
+    }
+    // remove value in possible values for col
+    for (int c = 0; c < 9; c++) {
+      possibleValues = this.grid[row][c].getPossibleValues();
+      if (possibleValues.contains(value)) {
+        possibleValues.remove(value);
+      }
+    }
+    // remove value in possible values for mini-grid
+    int cornerRow = row - (row % 3);
+    int cornerCol = col - (col % 3);
+    for (int r = 0; r < 3; r++) {
+      for (int c = 0; c < 3; c++) {
+        possibleValues = this.grid[cornerRow + r][cornerCol + c].getPossibleValues();
+        if (possibleValues.contains(value)) {
+          possibleValues.remove(value);
+        }
+      }
+    }
   }
 
   private int getMiniGridNum(int row, int col) {
