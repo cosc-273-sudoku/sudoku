@@ -1,22 +1,20 @@
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Cell {
-  private AtomicInteger value = new AtomicInteger();
-  private Set<Integer> possibleValues = Collections.synchronizedSet(new HashSet<Integer>());
+  private int value;
+  private Set<Integer> possibleValues = new HashSet<Integer>();
 
   public Cell(int value) {
-    this.value.set(value);
+    this.value = value;
   }
 
   public int getValue() {
-    return this.value.get();
+    return this.value;
   }
 
   public void setValue(int value) {
-    this.value.set(value);
+    this.value = value;
   }
 
   public Set<Integer> getPossibleValues() {
@@ -24,6 +22,6 @@ public class Cell {
   }
 
   public void setPossibleValues(Set<Integer> possibleValues) {
-    this.possibleValues = Collections.synchronizedSet(possibleValues);
+    this.possibleValues = possibleValues;
   }
 }
