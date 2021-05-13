@@ -4,13 +4,12 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-// inspiration for code from https://www.geeksforgeeks.org/program-sudoku-generator/
 public class Board {
   private Cell[][] grid = new Cell[9][9];
-  private Lock gridLock = new ReentrantLock();
-  private Lock[] rowLocks = new ReentrantLock[9];
-  private Lock[] colLocks = new ReentrantLock[9];
-  private Lock[] miniGridLocks = new ReentrantLock[9];
+  private Lock gridLock = new ReentrantLock(); // higher level lock for the grid
+  private Lock[] rowLocks = new ReentrantLock[9]; // array of locks for each row
+  private Lock[] colLocks = new ReentrantLock[9]; // array of locks for each column
+  private Lock[] miniGridLocks = new ReentrantLock[9]; // array of locks for each mini-grid
 
   public Board() {
     // initialize grid to Cells with 0 as value
@@ -41,6 +40,9 @@ public class Board {
     return s;
   }
 
+  /*
+   * equals method to compare one board to another.
+   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -127,7 +129,7 @@ public class Board {
     gridLock.lock();
     try {
       int miniGridLockIndex = getMiniGridNum(row, col);
-      ArrayList<Lock> locks = new ArrayList<Lock>();
+      ArrayList<Lock> locks = new ArrayList<Lock>(); // array to store successful locks
       if (this.rowLocks[row].tryLock()) {
         locks.add(this.rowLocks[row]);
       }
@@ -137,8 +139,8 @@ public class Board {
       if (this.miniGridLocks[miniGridLockIndex].tryLock()) {
         locks.add(this.miniGridLocks[miniGridLockIndex]);
       }
-      if (locks.size() != 3) {
-        for (Lock lock : locks) {
+      if (locks.size() != 3) { // if we weren't successful to lock one of the locks
+        for (Lock lock : locks) { // unlock all the locks that we've locked
           lock.unlock();
         }
         return false;
@@ -163,6 +165,9 @@ public class Board {
     }
   }
 
+  /*
+   * Sets the possible values for each Cell in the grid
+   */
   public void setPossibleValuesForGrid() {
     for (int row = 0; row < 9; row++) {
       for (int col = 0; col < 9; col++) {
@@ -174,7 +179,7 @@ public class Board {
   }
 
   /*
-   * Sets the possible values for each Cell in the grid
+   * Sets the possible values for a Cell in the grid
    */
   private void setPossibleValuesForCell(int row, int col) {
     Set<Integer> possibleValues = new HashSet<Integer>();
@@ -217,7 +222,7 @@ public class Board {
   }
 
   /*
-   * removes value from the set of possible values in
+   * Removes value from the set of possible values in
    * the row, column, and mini-grid of the Cell
    */
   public void removePossibleValue(int row, int col, int value) {
@@ -249,8 +254,11 @@ public class Board {
     }
   }
 
+  /*
+   * Gets the index for the mini-grid that the row and col are in
+   * (counting from left to right, top to bottom)
+   */
   private int getMiniGridNum(int row, int col) {
-    // Converts from 9x9 grid values to 3x3 grid values
     int miniGridRow = (row - (row % 3)) / 3;
     int miniGridCol = (col - (col % 3)) / 3;
 
