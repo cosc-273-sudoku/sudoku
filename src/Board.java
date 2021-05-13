@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -164,19 +167,28 @@ public class Board {
   }
 
   public void setPossibleValuesForGrid() {
+    int nThreads = Runtime.getRuntime().availableProcessors();
+    ExecutorService pool = Executors.newFixedThreadPool(nThreads);
     for (int row = 0; row < 9; row++) {
       for (int col = 0; col < 9; col++) {
         if (this.grid[row][col].getValue() == 0) {
-          setPossibleValuesForCell(row, col);
+          SetPossibleValuesForCellTask t = new SetPossibleValuesForCellTask(this, row, col);
+          pool.execute(t);
         }
       }
+    }
+    pool.shutdown();
+    try {
+      pool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+    } catch (InterruptedException e) {
+      // do nothing
     }
   }
 
   /*
    * Sets the possible values for each Cell in the grid
    */
-  private void setPossibleValuesForCell(int row, int col) {
+  public void setPossibleValuesForCell(int row, int col) {
     Set<Integer> possibleValues = new HashSet<Integer>();
     for (int value = 1; value <= 9; value++) {
       possibleValues.add(value);
