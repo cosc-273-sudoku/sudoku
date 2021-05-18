@@ -17,7 +17,7 @@ public class Parallel {
       elimination(board, valueSet, nThreads);
       // call loneRangers; if the method returns and a value
       // has been set in the grid, restart from elimination
-      // loneRangers();
+      loneRangers(board, valueSet, nThreads);
       // if (valueSet.get()) {
       //   continue;
       // }
@@ -55,12 +55,36 @@ public class Parallel {
     } while (valueSet.get());
   }
 
-  private static void loneRangers() {
+  private static void loneRangers(Board board, AtomicBoolean valueSet, int nThreads) {
     // do {
     //   execute tasks
     //   if (valueSet.get()) {
     //     return;
     //   }
     // } while (valueSet.get());
+    do {
+      ExecutorService pool = Executors.newFixedThreadPool(nThreads);
+      valueSet.set(false);
+      // execute elimination task on each mini-grid
+      for (int cornerRow = 0; cornerRow < 9; cornerRow += 3) {
+        for (int cornerCol = 0; cornerCol < 9; cornerCol += 3) {
+          boolean checkRows = false;
+          boolean checkCols = false;
+          if ((cornerRow == 0 && cornerCol == 0) || (cornerRow == 3 && cornerCol == 3) || (cornerRow == 6 && cornerCol == 3)) {
+            checkRows = true;
+          } else if ((cornerRow == 3 && cornerCol == 0) || (cornerRow == 0 && cornerCol == 3) || (cornerRow == 0 && cornerCol == 6)) {
+            checkCols = true;
+          }
+          LoneRangersTask LRTask = new LoneRangersTask(board, cornerRow, cornerCol, checkRows, checkCols, true, valueSet);
+          pool.execute(LRTask);
+        }
+      }
+      pool.shutdown();
+      try {
+        pool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+      } catch (InterruptedException e) {
+        // do nothing
+      }
+    } while (valueSet.get());
   }
 }
