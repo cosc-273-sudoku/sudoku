@@ -15,12 +15,15 @@ public class Parallel {
     int nThreads = Runtime.getRuntime().availableProcessors();
     do {
       elimination(board, valueSet, nThreads);
+      if (valueSet.get()) {
+        continue;
+      }
       // call loneRangers; if the method returns and a value
       // has been set in the grid, restart from elimination
       loneRangers(board, valueSet, nThreads);
-      // if (valueSet.get()) {
-      //   continue;
-      // }
+      if (valueSet.get()) {
+        continue;
+      }
     } while (valueSet.get()); // loop while a value has been set in the grid
 
     // System.out.println("Before backtrack:");
@@ -36,55 +39,58 @@ public class Parallel {
    * in the grid has been set
    */
   private static void elimination(Board board, AtomicBoolean valueSet, int nThreads) {
-    do {
-      ExecutorService pool = Executors.newFixedThreadPool(nThreads);
-      valueSet.set(false);
-      // execute elimination task on each mini-grid
-      for (int cornerRow = 0; cornerRow < 9; cornerRow += 3) {
-        for (int cornerCol = 0; cornerCol < 9; cornerCol += 3) {
-          EliminationTask elemTask = new EliminationTask(board, cornerRow, cornerCol, valueSet);
-          pool.execute(elemTask);
-        }
+    ExecutorService pool = Executors.newFixedThreadPool(nThreads);
+    valueSet.set(false);
+    // execute elimination task on each mini-grid
+    for (int cornerRow = 0; cornerRow < 9; cornerRow += 3) {
+      for (int cornerCol = 0; cornerCol < 9; cornerCol += 3) {
+        EliminationTask elemTask = new EliminationTask(board, cornerRow, cornerCol, valueSet);
+        pool.execute(elemTask);
       }
-      pool.shutdown();
-      try {
-        pool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-      } catch (InterruptedException e) {
-        // do nothing
-      }
-    } while (valueSet.get());
+    }
+    pool.shutdown();
+    try {
+      pool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+    } catch (InterruptedException e) {
+      // do nothing
+    }
   }
 
   private static void loneRangers(Board board, AtomicBoolean valueSet, int nThreads) {
-    // do {
-    //   execute tasks
-    //   if (valueSet.get()) {
-    //     return;
-    //   }
-    // } while (valueSet.get());
-    do {
-      ExecutorService pool = Executors.newFixedThreadPool(nThreads);
-      valueSet.set(false);
-      // execute elimination task on each mini-grid
-      for (int cornerRow = 0; cornerRow < 9; cornerRow += 3) {
-        for (int cornerCol = 0; cornerCol < 9; cornerCol += 3) {
-          boolean checkRows = false;
-          boolean checkCols = false;
-          if ((cornerRow == 0 && cornerCol == 0) || (cornerRow == 3 && cornerCol == 3) || (cornerRow == 6 && cornerCol == 3)) {
-            checkRows = true;
-          } else if ((cornerRow == 3 && cornerCol == 0) || (cornerRow == 0 && cornerCol == 3) || (cornerRow == 0 && cornerCol == 6)) {
-            checkCols = true;
-          }
-          LoneRangersTask LRTask = new LoneRangersTask(board, cornerRow, cornerCol, checkRows, checkCols, true, valueSet);
-          pool.execute(LRTask);
-        }
+    ExecutorService pool = Executors.newFixedThreadPool(nThreads);
+    valueSet.set(false);
+    // execute elimination task on each mini-grid
+    for (int cornerRow = 0; cornerRow < 9; cornerRow += 3) {
+      for (int cornerCol = 0; cornerCol < 9; cornerCol += 3) {
+        boolean[] checks = getMiniGridChecks(cornerRow, cornerCol);
+        boolean checkRows = checks[0];
+        boolean checkCols = checks[1];
+        LoneRangersTask LRTask =
+            new LoneRangersTask(board, cornerRow, cornerCol, checkRows, checkCols, true, valueSet);
+        pool.execute(LRTask);
       }
-      pool.shutdown();
-      try {
-        pool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-      } catch (InterruptedException e) {
-        // do nothing
-      }
-    } while (valueSet.get());
+    }
+    pool.shutdown();
+    try {
+      pool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+    } catch (InterruptedException e) {
+      // do nothing
+    }
+  }
+
+  private static boolean[] getMiniGridChecks(int cornerRow, int cornerCol) {
+    boolean checkRows = false;
+    boolean checkCols = false;
+    if ((cornerRow == 0 && cornerCol == 0)
+        || (cornerRow == 3 && cornerCol == 3)
+        || (cornerRow == 6 && cornerCol == 3)) {
+      checkRows = true;
+    } else if ((cornerRow == 3 && cornerCol == 0)
+        || (cornerRow == 0 && cornerCol == 3)
+        || (cornerRow == 0 && cornerCol == 6)) {
+      checkCols = true;
+    }
+    boolean[] checks = {checkRows, checkCols};
+    return checks;
   }
 }
