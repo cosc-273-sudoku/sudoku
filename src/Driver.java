@@ -16,7 +16,7 @@ public class Driver {
     System.out.println(backtrackBoard);
     Board parallelBoard = generator.readTxt(filename);
     start = System.nanoTime();
-    Parallel.solveBoard(parallelBoard);
+    Parallel.solveBoard(parallelBoard, 2);
     stop = System.nanoTime();
     System.out.println("Solved Sudoku Board (Parallel):");
     System.out.println("Runtime: " + (stop - start));

@@ -1,3 +1,4 @@
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -5,7 +6,7 @@ public class Cell {
   private int row;
   private int col;
   private int value;
-  private Set<Integer> possibleValues = new HashSet<Integer>();
+  private Set<Integer> possibleValues = Collections.synchronizedSet(new HashSet<Integer>());
 
   public Cell(int value, int row, int col) {
     this.value = value;

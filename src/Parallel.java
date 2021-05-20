@@ -4,15 +4,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Parallel {
+
   /*
    * Solves the sudoku board using parallel techniques
    */
-  public static void solveBoard(Board board) {
+  public static void solveBoard(Board board, int nThreads) {
     // set possible values for each cell in the grid
     board.setPossibleValuesForGrid();
     // true if a value has been set in the grid, valse otherwise
     AtomicBoolean valueSet = new AtomicBoolean(false);
-    int nThreads = Runtime.getRuntime().availableProcessors();
     do {
       // call elimantion; if the method returns and a value
       // has been set in the grid, redo elimination
