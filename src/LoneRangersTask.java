@@ -1,18 +1,18 @@
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LoneRangersTask implements Runnable {
-  private Board board;
-  private int cornerRow;
-  private int cornerCol;
-  private boolean checkRows;
-  private boolean checkCols;
-  private boolean checkMiniGrid;
-  private AtomicBoolean valueSet;
+  private Board board; // sudoku board
+  private int cornerRow; // row index of the mini-grid's top left corner
+  private int cornerCol; // col index of the min-grid's top left corner
+  private boolean checkRows; // whether to check rows
+  private boolean checkCols; // whether to check columns
+  private AtomicBoolean valueSet; // whether a value has been set in the grid
 
   public LoneRangersTask(
       Board board,
@@ -20,7 +20,6 @@ public class LoneRangersTask implements Runnable {
       int cornerCol,
       boolean checkRows,
       boolean checkCols,
-      boolean checkMiniGrid,
       AtomicBoolean valueSet) {
     this.board = board;
     this.cornerRow = cornerRow;
@@ -31,64 +30,148 @@ public class LoneRangersTask implements Runnable {
   }
 
   public void run() {
-    Cell[][] grid = this.board.getGrid();
-    Set<Integer> possibleValues = new HashSet<Integer>();
-    HashMap<Integer, List<Integer>> valFreq =
-        new HashMap<
-            Integer,
-            List<
-                Integer>>(); // record for each 1-9 value, the locations it can be in as two values
-                             // --> row col
-    for (int i = 0; i < 9; i++) valFreq.put(i, Collections.emptyList());
-
-    int row = 0;
-    int col = 0;
-
-    for (int i = 0; i < 3; i++) {
-      if (checkRows || checkMiniGrid) {
-        row = this.cornerRow + i;
-      } else if (checkCols) {
-        col = this.cornerCol + i;
+    // create a job queue
+    Queue<Job> jobQueue = new LinkedList<Job>();
+    if (checkRows) {
+      // add row jobs
+      for (int r = 0; r < 3; r++) {
+        jobQueue.add(new RowJob(this.cornerRow + r));
       }
-
-      // if (!this.board.tryLockCell(row, 0)) {
-      //   continue;
-      // }
-
-      for (int j = 0;
-          j < 9;
-          j++) { // for each cell, incrememnt freq counter for values' possible placements
-        if (checkRows) {
-          col = this.cornerCol + j;
-        } else if (checkCols) {
-          row = this.cornerRow + j;
-        } else { // checkMiniGrid
-          col = this.cornerCol + j / 3;
-        }
-
-        possibleValues = grid[row][col].getPossibleValues();
-        for (Integer num : possibleValues) {
-          List<Integer> newLocations = valFreq.get(num);
-          newLocations.add(row);
-          newLocations.add(col);
-          valFreq.put(
-              num, newLocations); // add the row and col location number can be in to freq counter
-        }
+    } else if (checkCols) {
+      // add column jobs
+      for (int c = 0; c < 3; c++) {
+        jobQueue.add(new ColJob(this.cornerCol + c));
       }
     }
+    jobQueue.add(new MiniGridJob()); // add mini grid job
+    // while there are still jobs to run
+    while (!jobQueue.isEmpty()) {
+      Job job = jobQueue.remove();
+      if (job instanceof RowJob) {
+        executeRowJob(job, jobQueue);
+      } else if (job instanceof ColJob) {
+        executeColJob(job, jobQueue);
+      } else { // job is instance of MiniGridJob
+        executeMiniGridJob(job, jobQueue);
+      }
+    }
+  }
 
-    // if any values can only be in one place
-    for (HashMap.Entry<Integer, List<Integer>> entry : valFreq.entrySet()) {
-      int num = entry.getKey();
-      List<Integer> locations = entry.getValue();
+  /*
+   * Try to find and set lone ranger in row
+   */
+  private void executeRowJob(Job job, Queue<Job> jobQueue) {
+    int row = job.row;
+    // try to lock row, col, and mini-grid of cell
+    if (this.board.tryLockCell(row, 0)) {
+      try {
+        Cell[][] grid = this.board.getGrid();
+        // map of possible value (1 - 9) to
+        // cells with that value
+        HashMap<Integer, ArrayList<Cell>> possibleValueCellsMap =
+            new HashMap<Integer, ArrayList<Cell>>();
+        // for each cell in row
+        for (int col = 0; col < 9; col++) {
+          // add possible values of cell to the map
+          addPossibleValuesToMap(row, col, possibleValueCellsMap, grid);
+        }
+        // find and set the long ranger
+        setLoneRanger(possibleValueCellsMap);
+      } finally {
+        // unlock row, col, and mini-grid of cell
+        this.board.unlockCell(row, 0);
+      }
+    } else { // if unable to lock, add job back to jobQueue
+      jobQueue.add(job);
+    }
+  }
 
-      if (locations.size() == 2) { // if only one location (row and col)
-        row = locations.get(0);
-        col = locations.get(1);
-        grid[row][col].setValue(num); // set value of cell to the single possible value
-        this.valueSet.set(true); // indicate a value has been set in the grid
-        // this.board.removePossibleValue(row, col, value); //remove value from possible set for
-        // each cell in row, col, and minigrid
+  /*
+   * Try to find and set lone ranger in column
+   */
+  private void executeColJob(Job job, Queue<Job> jobQueue) {
+    int col = job.col;
+    if (this.board.tryLockCell(0, col)) {
+      try {
+        Cell[][] grid = this.board.getGrid();
+        HashMap<Integer, ArrayList<Cell>> possibleValueCellsMap =
+            new HashMap<Integer, ArrayList<Cell>>();
+        // for each cell in column
+        for (int row = 0; row < 9; row++) {
+          addPossibleValuesToMap(row, col, possibleValueCellsMap, grid);
+        }
+        setLoneRanger(possibleValueCellsMap);
+      } finally {
+        this.board.unlockCell(0, col);
+      }
+    } else {
+      jobQueue.add(job);
+    }
+  }
+
+  /*
+   * Try to find and set lone ranger in mini-grid
+   */
+  private void executeMiniGridJob(Job job, Queue<Job> jobQueue) {
+    if (this.board.tryLockCell(this.cornerRow, this.cornerCol)) {
+      try {
+        Cell[][] grid = this.board.getGrid();
+        HashMap<Integer, ArrayList<Cell>> possibleValueCellsMap =
+            new HashMap<Integer, ArrayList<Cell>>();
+        // for each cell in mini-grid
+        for (int r = 0; r < 3; r++) {
+          for (int c = 0; c < 3; c++) {
+            int row = this.cornerRow + r;
+            int col = this.cornerCol + c;
+            addPossibleValuesToMap(row, col, possibleValueCellsMap, grid);
+          }
+        }
+        setLoneRanger(possibleValueCellsMap);
+      } finally {
+        this.board.unlockCell(this.cornerRow, this.cornerCol);
+      }
+    } else {
+      jobQueue.add(job);
+    }
+  }
+
+  /*
+   * Add the possible values of the cell to the possibleValueCellsMap
+   */
+  private void addPossibleValuesToMap(
+      int row, int col, HashMap<Integer, ArrayList<Cell>> possibleValueCellsMap, Cell[][] grid) {
+    Cell cell = grid[row][col];
+    Set<Integer> possibleValues = cell.getPossibleValues();
+    // for each possible value
+    for (Integer value : possibleValues) {
+      // add possible value and corresponding cell to map
+      if (possibleValueCellsMap.containsKey(value)) {
+        possibleValueCellsMap.get(value).add(cell);
+      } else {
+        ArrayList<Cell> cells = new ArrayList<Cell>();
+        cells.add(cell);
+        possibleValueCellsMap.put(value, cells);
+      }
+    }
+  }
+
+  /*
+   * Try to find and set lone ranger using possibleValueCellsMap
+   */
+  private void setLoneRanger(HashMap<Integer, ArrayList<Cell>> possibleValueCellsMap) {
+    // for each possibleValue, cells in the map
+    for (Map.Entry<Integer, ArrayList<Cell>> entry : possibleValueCellsMap.entrySet()) {
+      // if there is only one cell for the possible value
+      if (entry.getValue().size() == 1) {
+        // set the value of the cell
+        Cell cell = entry.getValue().get(0);
+        Integer value = entry.getKey();
+        cell.setValue(value);
+        // indicate a value has been set in the grid
+        this.valueSet.set(true);
+        // remove the value from the set of possible values
+        // for each cell in the row, col, and mini-grid
+        this.board.removePossibleValue(cell.getRow(), cell.getCol(), value);
       }
     }
   }

@@ -15,7 +15,7 @@ public class Board {
     // initialize grid to Cells with 0 as value
     for (int r = 0; r < grid.length; r++) {
       for (int c = 0; c < grid.length; c++) {
-        grid[r][c] = new Cell(0);
+        grid[r][c] = new Cell(0, r, c);
       }
     }
 
