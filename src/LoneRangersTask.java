@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class LoneRangersTask implements Runnable {
   private Board board; // sudoku board
   private int cornerRow; // row index of the mini-grid's top left corner
-  private int cornerCol; // col index of the min-grid's top left corner
+  private int cornerCol; // col index of the mini-grid's top left corner
   private boolean checkRows; // whether to check rows
   private boolean checkCols; // whether to check columns
   private AtomicBoolean valueSet; // whether a value has been set in the grid
