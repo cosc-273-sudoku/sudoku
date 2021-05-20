@@ -1,8 +1,8 @@
 public class Driver {
   public static void main(String args[]) {
-    String filename = "../boards/" + args[0];
+    String filename = args[0];
     BoardGenerator generator = new BoardGenerator();
-    // generator.generate(filename);
+    generator.generate(filename);
     Board backtrackBoard = generator.readTxt(filename);
     long start;
     long stop;
