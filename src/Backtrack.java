@@ -71,4 +71,20 @@ public class Backtrack {
     }
     return false;
   }
+
+  // Runs backtracking algorithm on a given board.
+  // The first argument is the path to the board file
+  public static void main(String[] args) {
+    String filename = args[0];
+    BoardGenerator generator = new BoardGenerator();
+    Board board = generator.readTxt(filename);
+    System.out.println("Sudoku Board:");
+    System.out.println(board);
+    long start = System.nanoTime();
+    Backtrack.solveBoard(board);
+    long stop = System.nanoTime();
+    System.out.println("Solved Sudoku Board (Backtrack):");
+    System.out.println(board);
+    System.out.println("Solver Runtime: " + (stop - start) + " ms");
+  }
 }
