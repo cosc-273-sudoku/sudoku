@@ -69,10 +69,11 @@ public class Results {
     try {
       FileWriter writer = new FileWriter(args[2]);
       for (int i = 0; i < seqBoards.length; i++) {
-        writer.write("Board: " + boardNames[i] + "\n");
-        writer.write("Average Seq. Runtime: " + seqResults[i].getMean() + "; Average Par. Runtime: " + parResults[i].getMean() + "\n" + "\n");
+        writer.write(seqResults[i].getMean() + "," + parResults[i].getMean() + ",");
       }
       writer.close();
+
+
     } catch (IOException e) {
       System.out.println("Error writing out results");
     }
