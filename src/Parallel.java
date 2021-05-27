@@ -16,16 +16,12 @@ public class Parallel {
       // call elimantion; if the method returns and a value
       // has been set in the grid, redo elimination
       elimination(board, valueSet, nThreads);
-      System.out.println("After elimination:");
-      System.out.println(board);
       if (valueSet.get()) {
         continue;
       }
       // call loneRangers; if the method returns and a value
       // has been set in the grid, restart from elimination
       loneRangers(board, valueSet, nThreads);
-      System.out.println("After loneRangers:");
-      System.out.println(board);
       if (valueSet.get()) {
         continue;
       }
