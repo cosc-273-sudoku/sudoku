@@ -5,23 +5,30 @@ public class Results {
   private static String[] boardNames = new String[1];
   public static void main (String[] args) {
 
-    if (args.length != 2) {
-      System.out.println("USAGE: java Results [number of trials] [name of file to write results]");
+    // Takes in 3 arguments; the number of threads to test on, the number of trials per board, and the name of the output file
+    if (args.length != 3) {
+      System.out.println("USAGE: java Results [number of threads] [number of trials] [name of file to write results]");
       System.exit(0);
     }
-
+    // Create Board objects for each board file; one for the sequential solver and one for the parallel solver
     BoardGenerator generator = new BoardGenerator();
     Board[] seqBoards = readBoards("boards", generator);
     Board[] parBoards = readBoards("boards", generator);
+    // Tracks list of boards' names for output purposes
     boardNames = getNames("boards");
 
-    int trials = Integer.valueOf(args[0]);
+    // Gets the number of threads and trials from arguments, generates Summary objects
+    // to store the results of each trial.
+    int nThreads = Integer.valueOf(args[0]);
+    int trials = Integer.valueOf(args[1]);
     Summary[] seqResults = new Summary[seqBoards.length];
     Summary[] parResults = new Summary[seqBoards.length];
+    // Initializing Summary objects
     for (int i = 0; i < seqBoards.length; i++) {
       seqResults[i] = new Summary(trials);
       parResults[i] = new Summary(trials);
     }
+
 
     long start;
     long end;
@@ -38,18 +45,19 @@ public class Results {
 
         // Parallel run
         start = System.nanoTime();
-        Parallel.solveBoard(parBoards[j], 2); //TODO: update nThreads value?
+        Parallel.solveBoard(parBoards[j], nThreads);
         end = System.nanoTime();
         runtime = (double) (end - start);
         parResults[j].update(i, runtime);
 
       }
 
-      // Boards have been modified; reset them before next set of trials
+      // Solving boards modifies their contents; we re-read the initial board states to reset them before the next set of trials
       seqBoards = readBoards("boards", generator);
       parBoards = readBoards("boards", generator);
 
     }
+    // Prints results of solving each board in parallel and sequentially to the console
     System.out.println();
     for (int i = 0; i < seqBoards.length; i++) {
       System.out.println("Board: " + boardNames[i]);
@@ -57,8 +65,9 @@ public class Results {
       System.out.println();
     }
 
+    // Writes the same information to the output file
     try {
-      FileWriter writer = new FileWriter(args[1]);
+      FileWriter writer = new FileWriter(args[2]);
       for (int i = 0; i < seqBoards.length; i++) {
         writer.write("Board: " + boardNames[i] + "\n");
         writer.write("Average Seq. Runtime: " + seqResults[i].getMean() + "; Average Par. Runtime: " + parResults[i].getMean() + "\n" + "\n");
@@ -68,9 +77,11 @@ public class Results {
       System.out.println("Error writing out results");
     }
 
-    System.out.println("Results written to " + args[1]);
+    System.out.println("Results written to " + args[2]);
   }
 
+  // Given a directory and a BoardGenerator object, read each file in the directory
+  // as a Board, and add it to a list of Boards. Return an array containing all Boards found
   private static Board[] readBoards (String directory, BoardGenerator bg) {
     final File folder = new File("../" + directory);
     if (!folder.isDirectory()) {
@@ -89,6 +100,7 @@ public class Results {
     return boards.toArray(a);
   }
 
+  // Given a directory, collect a list of file names in the directory
   private static String[] getNames (String directory) {
     final File folder = new File("../" + directory);
     if (!folder.isDirectory()) {
@@ -106,6 +118,9 @@ public class Results {
   }
 }
 
+// Summary class stores an array of runtimes
+// for n different trials, and returns the mean
+// value when prompted.
 class Summary {
   double[] runtimes;
 
