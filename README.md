@@ -73,6 +73,6 @@ We use a humanistic algorithm that revolves around eliminating possibilities usi
 
 ## Testing
 
-Look at the `results/results.csv` for the results.
+Look at `results/results.csv` for the results.
 
 Parallelism did not improve the performance. This might be because of too much contention for the locks or thread creation overhead; we create many threads/tasks in implementing our strategies. It might also be because of the amount of workload distributed for each thread. We also were not able to implement two of the planned humanistic strategies, twins and triplets. Furthermore there might be some optimizations made by the java compiler that better helped the backtracking performance.
