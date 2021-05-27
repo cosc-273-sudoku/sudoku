@@ -5,7 +5,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Board {
-  private Cell[][] grid = new Cell[9][9];
+  private Cell[][] grid = new Cell[9][9]; // grid for sudoku board
   private Lock gridLock = new ReentrantLock(); // higher level lock for the grid
   private Lock[] rowLocks = new ReentrantLock[9]; // array of locks for each row
   private Lock[] colLocks = new ReentrantLock[9]; // array of locks for each column
@@ -40,9 +40,7 @@ public class Board {
     return s;
   }
 
-  /*
-   * equals method to compare one board to another.
-   */
+  // equals method to compare one board to another.
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -151,9 +149,7 @@ public class Board {
     }
   }
 
-  /*
-   * Unlocks the cell's row, column, and mini-grid.
-   */
+  // Unlocks the cell's row, column, and mini-grid.
   public void unlockCell(int row, int col) {
     gridLock.lock();
     try {
@@ -165,9 +161,7 @@ public class Board {
     }
   }
 
-  /*
-   * Sets the possible values for each Cell in the grid
-   */
+  // Sets the possible values for each Cell in the grid
   public void setPossibleValuesForGrid() {
     for (int row = 0; row < 9; row++) {
       for (int col = 0; col < 9; col++) {
@@ -178,9 +172,7 @@ public class Board {
     }
   }
 
-  /*
-   * Sets the possible values for a Cell in the grid
-   */
+  // Sets the possible values for a Cell in the grid
   private void setPossibleValuesForCell(int row, int col) {
     Set<Integer> possibleValues = new HashSet<Integer>();
     for (int value = 1; value <= 9; value++) {

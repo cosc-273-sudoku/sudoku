@@ -83,4 +83,11 @@ public class BoardGenerator {
     }
     return board;
   }
+
+  // Generate a board given a filename
+  public static void main(String[] args) {
+    String filename = args[0];
+    BoardGenerator generator = new BoardGenerator();
+    generator.generate(filename);
+  }
 }

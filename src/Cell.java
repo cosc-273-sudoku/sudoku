@@ -2,11 +2,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+// Represents a cell in the sudoku grid
 public class Cell {
-  private int row;
-  private int col;
-  private int value;
-  private Set<Integer> possibleValues = Collections.synchronizedSet(new HashSet<Integer>());
+  private int row; // cell row
+  private int col; // cell column
+  private int value; // cell value
+  private Set<Integer> possibleValues =
+      Collections.synchronizedSet(new HashSet<Integer>()); // possible values for cell
 
   public Cell(int value, int row, int col) {
     this.value = value;

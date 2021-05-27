@@ -3,11 +3,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+// Implementation of parallel algorithm to solve sudoku board
 public class Parallel {
 
-  /*
-   * Solves the sudoku board using parallel techniques
-   */
+  // Solves the sudoku board using parallel techniques
   public static void solveBoard(Board board, int nThreads) {
     // set possible values for each cell in the grid
     board.setPossibleValuesForGrid();
@@ -36,9 +35,7 @@ public class Parallel {
     Backtrack.solveBoard(board);
   }
 
-  /*
-   * Execute elimination tasks in parallel
-   */
+  // Execute elimination tasks in parallel
   private static void elimination(Board board, AtomicBoolean valueSet, int nThreads) {
     ExecutorService pool = Executors.newFixedThreadPool(nThreads);
     valueSet.set(false);
@@ -57,9 +54,7 @@ public class Parallel {
     }
   }
 
-  /*
-   * Execute loneRangers tasks in parallel
-   */
+  // Execute loneRangers tasks in parallel
   private static void loneRangers(Board board, AtomicBoolean valueSet, int nThreads) {
     ExecutorService pool = Executors.newFixedThreadPool(nThreads);
     valueSet.set(false);
@@ -85,7 +80,8 @@ public class Parallel {
 
   /*
    * Determine whether to check rows or columns
-   * based on which mini-grid we are at
+   * based on which mini-grid we are at.
+   * Source: https://cse.buffalo.edu/faculty/miller/Courses/CSE633/Sankar-Spring-2014-CSE633.pdf Slide 11
    */
   private static boolean[] getMiniGridChecks(int cornerRow, int cornerCol) {
     boolean checkRows = false;

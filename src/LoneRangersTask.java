@@ -57,9 +57,7 @@ public class LoneRangersTask implements Runnable {
     }
   }
 
-  /*
-   * Try to find and set lone ranger in row
-   */
+  // Try to find and set lone ranger in row
   private void executeRowJob(Job job, Queue<Job> jobQueue) {
     int row = job.row;
     // try to lock row, col, and mini-grid of cell
@@ -86,9 +84,7 @@ public class LoneRangersTask implements Runnable {
     }
   }
 
-  /*
-   * Try to find and set lone ranger in column
-   */
+  // Try to find and set lone ranger in column
   private void executeColJob(Job job, Queue<Job> jobQueue) {
     int col = job.col;
     if (this.board.tryLockCell(0, col)) {
@@ -109,9 +105,7 @@ public class LoneRangersTask implements Runnable {
     }
   }
 
-  /*
-   * Try to find and set lone ranger in mini-grid
-   */
+  // Try to find and set lone ranger in mini-grid
   private void executeMiniGridJob(Job job, Queue<Job> jobQueue) {
     if (this.board.tryLockCell(this.cornerRow, this.cornerCol)) {
       try {
@@ -135,9 +129,7 @@ public class LoneRangersTask implements Runnable {
     }
   }
 
-  /*
-   * Add the possible values of the cell to the possibleValueCellsMap
-   */
+  // Add the possible values of the cell to the possibleValueCellsMap
   private void addPossibleValuesToMap(
       int row, int col, HashMap<Integer, ArrayList<Cell>> possibleValueCellsMap, Cell[][] grid) {
     Cell cell = grid[row][col];
@@ -155,9 +147,7 @@ public class LoneRangersTask implements Runnable {
     }
   }
 
-  /*
-   * Try to find and set lone ranger using possibleValueCellsMap
-   */
+  // Try to find and set lone ranger using possibleValueCellsMap
   private void setLoneRanger(HashMap<Integer, ArrayList<Cell>> possibleValueCellsMap) {
     // for each possibleValue, cells in the map
     for (Map.Entry<Integer, ArrayList<Cell>> entry : possibleValueCellsMap.entrySet()) {
