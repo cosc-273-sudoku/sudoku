@@ -5,8 +5,8 @@ public class Results {
   private static String[] boardNames = new String[1];
   public static void main (String[] args) {
 
-    if (args.length != 2) {
-      System.out.println("USAGE: java Results [number of trials] [name of file to write results]");
+    if (args.length != 3) {
+      System.out.println("USAGE: java Results [number of threads] [number of trials] [name of file to write results]");
       System.exit(0);
     }
 
@@ -15,7 +15,8 @@ public class Results {
     Board[] parBoards = readBoards("boards", generator);
     boardNames = getNames("boards");
 
-    int trials = Integer.valueOf(args[0]);
+    int nThreads = Integer.valueOf(args[0]);
+    int trials = Integer.valueOf(args[1]);
     Summary[] seqResults = new Summary[seqBoards.length];
     Summary[] parResults = new Summary[seqBoards.length];
     for (int i = 0; i < seqBoards.length; i++) {
@@ -38,7 +39,7 @@ public class Results {
 
         // Parallel run
         start = System.nanoTime();
-        Parallel.solveBoard(parBoards[j], 2); //TODO: update nThreads value?
+        Parallel.solveBoard(parBoards[j], nThreads);
         end = System.nanoTime();
         runtime = (double) (end - start);
         parResults[j].update(i, runtime);
@@ -58,7 +59,7 @@ public class Results {
     }
 
     try {
-      FileWriter writer = new FileWriter(args[1]);
+      FileWriter writer = new FileWriter(args[2]);
       for (int i = 0; i < seqBoards.length; i++) {
         writer.write("Board: " + boardNames[i] + "\n");
         writer.write("Average Seq. Runtime: " + seqResults[i].getMean() + "; Average Par. Runtime: " + parResults[i].getMean() + "\n" + "\n");
@@ -68,7 +69,7 @@ public class Results {
       System.out.println("Error writing out results");
     }
 
-    System.out.println("Results written to " + args[1]);
+    System.out.println("Results written to " + args[2]);
   }
 
   private static Board[] readBoards (String directory, BoardGenerator bg) {
